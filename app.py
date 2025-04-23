@@ -23,7 +23,7 @@ if "selected_suspect" not in st.session_state:
 if "final_choice" not in st.session_state:
     st.session_state.final_choice = None
 
-st.title("🔍 LLM 기반 용의자 추리 게임")
+st.title("🔍 용의자 추리 게임")
 
 # 게임 시작 버튼
 if st.button("🕵️ 게임 시작") or st.session_state.scenario is None:
