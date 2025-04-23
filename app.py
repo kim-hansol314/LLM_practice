@@ -2,6 +2,8 @@ import streamlit as st
 from scenario import generate_crime_scenario
 from suspect import generate_suspects
 from chains import get_suspect_chain
+from dotenv import load_dotenv
+load_dotenv()
 
 st.set_page_config(page_title="LLM 기반 용의자 추리 게임", layout="centered")
 
@@ -15,7 +17,7 @@ if "chat_logs" not in st.session_state:
 if "turn" not in st.session_state:
     st.session_state.turn = 0
 if "max_turns" not in st.session_state:
-    st.session_state.max_turns = 5
+    st.session_state.max_turns = 9
 if "selected_suspect" not in st.session_state:
     st.session_state.selected_suspect = None
 if "final_choice" not in st.session_state:
@@ -48,30 +50,19 @@ if st.session_state.turn < st.session_state.max_turns:
     # 용의자 선택
     st.session_state.selected_suspect = st.selectbox("대화할 용의자를 선택하세요", [s['name'] for s in st.session_state.suspects])
 
-    # 질문 입력 필드
-    user_question = st.text_input("질문을 입력하세요")
-    
-    if user_question:
-        # 이전 대화 내역을 가져와서 현재 대화에 추가
-        chat_history = st.session_state.chat_logs.get(st.session_state.selected_suspect, [])
+    # 질문 입력 form
+    with st.form("chat_form"):
+        user_question = st.text_input("질문을 입력하세요", key="user_input")
+        submitted = st.form_submit_button("질문하기")
 
-        # chain.run()에 이전 대화 내역과 현재 질문을 하나의 입력 키로 묶어 전달
-        chain = get_suspect_chain(st.session_state.selected_suspect, st.session_state.scenario, st.session_state.suspects)
-        
-        # 이전 대화 내역과 질문을 포함한 입력
-        inputs = {
-            "question": user_question,  # question 키 포함
-            "history": chat_history     # history 키 포함
-        }
-        
-        # 입력값을 Chain에 전달하여 응답 받기
-        response = chain.run(inputs=inputs)
-        
-        # 대화 로그에 질문과 답변 저장
-        chat_history.append((user_question, response))
-        st.session_state.chat_logs[st.session_state.selected_suspect] = chat_history
-        
-        # 턴 증가 및 화면 갱신
+    if submitted and user_question:
+        suspect_name = st.session_state.selected_suspect
+
+        chain = get_suspect_chain(suspect_name, st.session_state.scenario, st.session_state.suspects)
+        response = chain.run(question=user_question)
+
+        st.session_state.chat_logs[suspect_name].append((user_question, response))
+
         st.session_state.turn += 1
         st.rerun()
 
