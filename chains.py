@@ -20,7 +20,7 @@ def get_suspect_chain(name, scenario, all_suspects):
 
         memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
 
-        llm = ChatOpenAI(temperature=0.7)
+        llm = ChatOpenAI(temperature=0.7, model_name='gpt-4o-mini')
 
         chain = LLMChain(llm=llm, prompt=prompt, memory=memory, verbose=False)
 
