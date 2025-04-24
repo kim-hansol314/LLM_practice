@@ -17,7 +17,7 @@ if "chat_logs" not in st.session_state:
 if "turn" not in st.session_state:
     st.session_state.turn = 0
 if "max_turns" not in st.session_state:
-    st.session_state.max_turns = 9
+    st.session_state.max_turns = 3
 if "selected_suspect" not in st.session_state:
     st.session_state.selected_suspect = None
 if "final_choice" not in st.session_state:
@@ -25,7 +25,6 @@ if "final_choice" not in st.session_state:
 
 st.title("🔍 용의자 추리 게임")
 
-# 게임 시작 버튼
 if st.button("🕵️ 게임 시작") or st.session_state.scenario is None:
     st.session_state.scenario = generate_crime_scenario()
     st.session_state.suspects = generate_suspects(st.session_state.scenario)
@@ -34,23 +33,21 @@ if st.button("🕵️ 게임 시작") or st.session_state.scenario is None:
     st.session_state.final_choice = None
     st.rerun()
 
-# 사건 개요 출력
 st.subheader("사건 개요")
 st.info(st.session_state.scenario['summary'])
 
-# 용의자 목록 출력
 st.subheader("용의자 목록")
 for s in st.session_state.suspects:
     st.markdown(f"**{s['name']}** - {s['description']}")
 
-# 질문을 진행하는 부분
+# 질문
 if st.session_state.turn < st.session_state.max_turns:
     st.markdown(f"### 🗣️ {st.session_state.turn+1} / {st.session_state.max_turns}번째 질문")
 
     # 용의자 선택
     st.session_state.selected_suspect = st.selectbox("대화할 용의자를 선택하세요", [s['name'] for s in st.session_state.suspects])
 
-    # 질문 입력 form
+    # 질문 입력
     with st.form("chat_form"):
         user_question = st.text_input("질문을 입력하세요", key="user_input")
         submitted = st.form_submit_button("질문하기")
@@ -67,7 +64,7 @@ if st.session_state.turn < st.session_state.max_turns:
         st.rerun()
 
 else:
-    # 게임 종료 후 범인 지목
+    # 범인 지목
     st.markdown("## 🤔 범인을 지목하세요")
     final_choice = st.radio("범인은 누구입니까?", [s['name'] for s in st.session_state.suspects])
     if st.button("🔎 정답 확인"):
@@ -79,7 +76,7 @@ else:
             st.error(f"😢 틀렸습니다. 진짜 범인은 **{true_culprit['name']}** 입니다.")
         st.markdown(f"#### 📝 범인의 설명: {true_culprit['truth']}")
 
-# 대화 로그 출력
+# 대화 로그
 st.markdown("---")
 st.subheader("💬 대화 로그")
 for suspect, chats in st.session_state.chat_logs.items():
