@@ -18,7 +18,7 @@
 | 항목 | 기술 |
 |------|------|
 | UI | Streamlit |
-| LLM | OpenAI GPT / Ollama (eeve) |
+| LLM | OpenAI |
 | 프레임워크 | LangChain |
 | 메모리 | ConversationBufferMemory |
 | 설정 방식 | 용의자별 역할 프롬프트 기반 롤플레이 |
